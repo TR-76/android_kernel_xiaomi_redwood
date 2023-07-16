@@ -1231,6 +1231,7 @@ static int power_supply_read_temp(struct thermal_zone_device *tzd,
 	struct power_supply *psy;
 	struct battery_chg_dev *bcdev = NULL;
 	struct psy_state *pst = NULL;
+	struct psy_state *batt_pst = NULL;
 	int rc = 0, batt_temp;
 	static int last_temp;
 	ktime_t time_now;
@@ -1241,6 +1242,7 @@ static int power_supply_read_temp(struct thermal_zone_device *tzd,
 	psy = tzd->devdata;
 	bcdev = power_supply_get_drvdata(psy);
 	pst = &bcdev->psy_list[PSY_TYPE_XM];
+	batt_pst = &bcdev->psy_list[PSY_TYPE_BATTERY];
 
 	time_now = ktime_get();
 	delta = ktime_ms_delta(time_now, last_read_time);
@@ -1254,9 +1256,10 @@ static int power_supply_read_temp(struct thermal_zone_device *tzd,
 	}
 
 	*temp = batt_temp * 1000;
-	pr_err("batt_thermal temp:%d ,delta:%ld blank_state=%d chg_type=%s tl:=%d  ffc:=%d, pd_verifed:=%d\n",
+	pr_err("batt_thermal temp:%d ,delta:%ld blank_state=%d chg_type=%s tl:=%d  ffc:=%d, pd_verifed:=%d r:=%d \n",
 		batt_temp,delta, bcdev->blank_state, power_supply_usb_type_text[pst->prop[XM_PROP_REAL_TYPE]],
-		bcdev->curr_thermal_level, pst->prop[XM_PROP_FASTCHGMODE], pst->prop[XM_PROP_PD_VERIFED]);
+		bcdev->curr_thermal_level, pst->prop[XM_PROP_FASTCHGMODE], pst->prop[XM_PROP_PD_VERIFED],
+		(batt_pst->prop[BATT_CHG_COUNTER]/(batt_pst->prop[BATT_CHG_FULL]/1000)));
 	return 0;
 }
 
