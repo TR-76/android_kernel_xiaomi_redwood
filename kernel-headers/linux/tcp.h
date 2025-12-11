@@ -170,6 +170,7 @@ enum tcp_fastopen_client_fail {
 #define TCPI_OPT_ECN		8 /* ECN was negociated at TCP session init */
 #define TCPI_OPT_ECN_SEEN	16 /* we received at least one packet with ECT */
 #define TCPI_OPT_SYN_DATA	32 /* SYN-ACK acked data in SYN sent or rcvd */
+#define TCPI_OPT_ECN_LOW	64 /* Low-latency ECN configured at init */
 
 /*
  * Sender's congestion state indicating normal or abnormal situations
@@ -284,6 +285,11 @@ struct tcp_info {
 	__u32	tcpi_snd_wnd;	     /* peer's advertised receive window after
 				      * scaling (bytes)
 				      */
+	__u32	tcpi_rcv_wnd;	     /* local advertised receive window after
+				      * scaling (bytes)
+				      */
+
+	__u32   tcpi_rehash;         /* PLB or timeout triggered rehash attempts */
 };
 
 /* netlink attributes types for SCM_TIMESTAMPING_OPT_STATS */
@@ -311,6 +317,8 @@ enum {
 	TCP_NLA_DSACK_DUPS,	/* DSACK blocks received */
 	TCP_NLA_REORD_SEEN,	/* reordering events seen */
 	TCP_NLA_SRTT,		/* smoothed RTT in usecs */
+	TCP_NLA_TIMEOUT_REHASH, /* Timeout-triggered rehash attempts */
+	TCP_NLA_REHASH,         /* PLB and timeout triggered rehash attempts */
 };
 
 /* for TCP_MD5SIG socket option */
